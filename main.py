@@ -12,7 +12,7 @@ soup = BeautifulSoup(html, "html.parser")
 
 
 """
-coup = BeautifulSoup(response.text, "html.parser")
+soup = BeautifulSoup(response.text, "html.parser")
 
 Desirable features of the parser to be used. This may be the name of a specific parser("lxml"
 , "lxml-xml", "html.parser", or "html5lib". It's recommended that you name a specific parses, 
