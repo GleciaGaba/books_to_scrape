@@ -1,0 +1,10 @@
+2024-07-25 14:26:18.512 | ERROR    | __main__:extract_price_from_page:113 - Aucun noeud contenant le prix n'a été trouvé.
+2024-07-25 15:41:37.466 | ERROR    | __main__:extract_stock_quantity_from_page:139 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
+2024-07-25 15:41:43.780 | ERROR    | __main__:extract_stock_quantity_from_page:139 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
+2024-07-25 15:42:19.117 | ERROR    | __main__:extract_stock_quantity_from_page:139 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
+2024-07-25 15:43:25.126 | ERROR    | __main__:extract_stock_quantity_from_page:139 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
+2024-07-25 15:44:02.245 | ERROR    | __main__:extract_stock_quantity_from_page:139 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
+2024-07-25 15:46:12.052 | ERROR    | __main__:extract_stock_quantity_from_page:139 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
+2024-07-25 15:48:23.411 | ERROR    | __main__:extract_stock_quantity_from_page:140 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
+2024-07-25 15:49:57.401 | ERROR    | __main__:extract_stock_quantity_from_page:140 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
+2024-07-25 15:50:28.715 | ERROR    | __main__:extract_stock_quantity_from_page:140 - Aucun noeud 'p.instock availability' n'a été trouvé sur la page 'NoneType' object has no attribute 'text'
