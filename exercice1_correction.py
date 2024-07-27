@@ -9,6 +9,8 @@ logger.remove()
 logger.add(f"books1.log", level="WARNING", rotation="500kb")
 logger.add(sys.stderr, level="INFO")
 
+BASE_URL = "https://books.toscrape.com/index.html"
+
 """
 ## Fonctions à coder
 
@@ -46,28 +48,58 @@ def get_all_books_urls(url: str) -> list[str]:
     :param url: URL de départ
     :return: Liste des URLs de toutes les pages
     """
-    pass
+    all_urls = []
+    with requests.Session() as session:
+
+        while True:
+            logger.info(f"Scraping page at {url}")
+            try:
+                response = session.get(url)
+                response.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Erreur lors de la requête HTTP sur la page {url}:{e}")
+                continue
+
+            tree = HTMLParser(response.text)
+            books_urls = get_all_books_urls_on_page(url, tree)
+            all_urls.extend(books_urls)
+
+            url = get_next_page_url(url, tree)
+            if not url:
+                break
+
+        return all_urls
 
 
-def get_next_page_url(tree: HTMLParser) -> str:
+def get_next_page_url(url: str, tree: HTMLParser) -> str | None:
     """Récupère l'URL de la page suivante à partir du HTML d'une page donnée.
-
+    :param url: URL de la page courante
     :param tree: Objet HTMLParser de la page à chercher.
     :return: URL de la page suivante.
     """
-    pass
+    next_page_node = tree.css_first("li.next > a")
+    if next_page_node and "href" in next_page_node.attributes:
+        next_url = urljoin(url, next_page_node.attributes["href"])
+        return next_url
+    logger.info("Aucun bouton next trouvé sur la page.")
+    return None
 
 
-def get_all_books_urls_on_page(tree: HTMLParser) -> list[str]:
+def get_all_books_urls_on_page(url: str, tree: HTMLParser) -> list[str]:
     """
     Récuperer toutes les URLs des livres présent sur une page.
 
+    :param url: URL de la page qui contient les livres
     :param tree: Objet HTMLParser de la page
     :return: Liste de URLs de tous les livres sur la page
     """
-    books_links_nodes = tree.css("h3 > a")
-    urls = [link for link in books_links_nodes]
-    print(urls)
+    try:
+        books_links_nodes = tree.css("h3 > a")
+        return [urljoin(url, link.attributes["href"]) for link in books_links_nodes if "href" in link.attributes]
+
+    except Exception as e:
+        logger.error(f"Erreur lors de l'extraction des URL's des livres : {e}")
+        return []
 
 
 """
@@ -81,7 +113,7 @@ def get_all_books_urls_on_page(tree: HTMLParser) -> list[str]:
 """
 
 
-def get_book_price(url: str) -> float:
+def get_book_price(url: str, session: requests.Session = None) -> float:
     """
     Récupère le prix d'un livre à partir de son URL.
 
@@ -90,12 +122,18 @@ def get_book_price(url: str) -> float:
     """
 
     try:
-        response = requests.get(url)
+        if session:
+            response = session.get(url)
+        else:
+            response = requests.get(url)
+
         response.raise_for_status()
         tree = HTMLParser(response.text)
         price = extract_price_from_page(tree=tree)
         stock = extract_stock_quantity_from_page(tree=tree)
-        return price * stock
+        price_stock = price * stock
+        logger.info(f"Get book price at {url}: found {price_stock}")
+        return price_stock
 
     except requests.exceptions.RequestException as e:
         logger.error(f"Erreur lors de la requête HTTP: {e}")
@@ -125,10 +163,6 @@ def extract_price_from_page(tree: HTMLParser) -> float:
         return float(price)
 
 
-
-
-
-
 def extract_stock_quantity_from_page(tree: HTMLParser) -> int:
     """ Extrait la quantité de livres en stock depuis le code HTML de la page
 
@@ -148,20 +182,18 @@ def extract_stock_quantity_from_page(tree: HTMLParser) -> int:
         return 0
 
 
-
 def main():
-    base_url = "https://books.toscrape.com/index.html"
-    all_books_urls = get_all_books_urls(url=base_url)
+    url_base = "https://books.toscrape.com/index.html"
+    all_books_urls = get_all_books_urls(url=url_base)
     total_price = []
-    for book_url in all_books_urls:
-        price = get_book_price(url=book_url)
-        total_price.append(price)
 
-    return total_price
+    with requests.Session() as session:
+        for book_url in all_books_urls:
+            price = get_book_price(url=book_url, session=session)
+            total_price.append(price)
+
+    return sum(total_price)
 
 
 if __name__ == '__main__':
-    url = "https://books.toscrape.com/index.html"
-    r = requests.get(url)
-    tree = HTMLParser(r.text)
-    get_all_books_urls_on_page(tree=tree)
+    print(main())
